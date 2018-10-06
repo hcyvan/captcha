@@ -17,4 +17,6 @@ pip install -r requirements.txt
 2. python3 train.py
 ```
 ### 识别
-
+```
+python3 predict.py
+```
