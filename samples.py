@@ -61,6 +61,7 @@ def convert2gray(img):
 def get_next_batch(batch_size=128):
     batch_x = np.zeros([batch_size, IMAGE_HEIGHT * IMAGE_WIDTH])
     batch_y = np.zeros([batch_size, MAX_CAPTCHA * CHAR_SET_LEN])
+
     def wrap_gen_captcha_text_and_image():
         while True:
             text, image = gen_captcha_text_and_image(False)

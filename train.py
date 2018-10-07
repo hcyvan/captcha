@@ -1,4 +1,6 @@
 import sys
+import datetime
+import time
 import tensorflow as tf
 
 from samples import get_next_batch
@@ -6,10 +8,23 @@ from config import *
 from cnn import crack_captcha_cnn, X, Y, keep_prob
 
 
-def log(msg, log_file='tmp.log'):
-    with open(log_file, 'a') as f:
-        f.write(msg + '\n')
-    sys.stdout.write(msg + '\n')
+def log(msg, start=None):
+    def get_progress_time(s):
+        h = s // 3600
+        s = s % 3600
+        m = s // 60
+        s = s % 60
+        return (h, m, s)
+    time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    if start:
+        delta_time = get_progress_time(int(time.time() - start))
+        ts = str(delta_time[0]) + 'h' + str(delta_time[1]) + 'm' + str(delta_time[2]) + 's'
+        log_msg = '{} training:{} {}'.format(time_now, ts, msg)
+    else:
+        log_msg = '{} {}'.format(time_now, msg)
+    with open(LOG_PATH, 'a') as f:
+        f.write(log_msg)
+    sys.stdout.write(log_msg + '\n')
 
 
 def train_crack_captcha_cnn():
@@ -27,19 +42,20 @@ def train_crack_captcha_cnn():
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         step = 0
+        start = time.time()
         while True:
             batch_x, batch_y = get_next_batch(64)
             _, loss_ = sess.run([optimizer, loss], feed_dict={X: batch_x, Y: batch_y, keep_prob: 0.75})
-            log('[{}] {}'.format(step, loss_))
-            # 每100 step计算一次准确率
+            log('step:{} loss:{}'.format(step, loss_), start)
             if step % 100 == 0:
                 batch_x_test, batch_y_test = get_next_batch(100)
                 acc = sess.run(accuracy, feed_dict={X: batch_x_test, Y: batch_y_test, keep_prob: 1.})
-                log('<--acc--> {}'.format(acc))
-                # 如果准确率大于50%,保存模型,完成训练
-                if acc > 0.5:
-                    saver.save(sess, "./model/crack_capcha.2.model", global_step=step)
+                log('step:{} ----accuracy {}'.format(step, acc), start)
+                if acc > STOP_ACC:
+                    saver.save(sess, CKPT_PATH, global_step=step)
                     break
             step += 1
+    tf.summary.FileWriter(BOARD_PATH, sess.graph)
+
 
 train_crack_captcha_cnn()

@@ -4,3 +4,5 @@ venv/*
 *.log
 model/*
 __pycache__/*
+board/*
+*/board/*

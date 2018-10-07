@@ -1,17 +1,18 @@
+import os
 import tensorflow as tf
 import numpy as np
 
 from cnn import crack_captcha_cnn, X, Y, keep_prob
 from config import *
 from text import vec2text
-from samples import gen_captcha_text_and_image, convert2gray, get_sina_captcha_text_random
+from samples import gen_captcha_text_and_image, convert2gray
 
 
 def crack_captcha(captcha_image):
     output = crack_captcha_cnn()
     saver = tf.train.Saver()
     with tf.Session() as sess:
-        saver.restore(sess, tf.train.latest_checkpoint('./model'))
+        saver.restore(sess, tf.train.latest_checkpoint(os.path.dirname(CKPT_PATH)))
 
         predict = tf.argmax(tf.reshape(output, [-1, MAX_CAPTCHA, CHAR_SET_LEN]), 2)
         text_list = sess.run(predict, feed_dict={X: [captcha_image], keep_prob: 1})
