@@ -23,7 +23,7 @@ def log(msg, start=None):
     else:
         log_msg = '{} {}'.format(time_now, msg)
     with open(LOG_PATH, 'a') as f:
-        f.write(log_msg)
+        f.write(log_msg + '\n')
     sys.stdout.write(log_msg + '\n')
 
 
