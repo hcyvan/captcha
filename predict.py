@@ -5,7 +5,10 @@ import numpy as np
 from cnn import crack_captcha_cnn, X, Y, keep_prob
 from config import *
 from text import vec2text
-from samples import gen_captcha_text_and_image, convert2gray
+from samples import gen_captcha_text_and_image,\
+    gen_sina_captcha_text_and_image,\
+    get_sina_captcha_text_random,\
+    convert2gray, convert2double
 
 
 def crack_captcha(captcha_image):
@@ -27,9 +30,9 @@ def crack_captcha(captcha_image):
 
 
 def crack_test():
-    text, image = gen_captcha_text_and_image(save=False)
-    # text, image = get_sina_captcha_text_random()
-    image = convert2gray(image)
+    text, image = get_sina_captcha_text_random()
+    # text, image = gen_sina_captcha_text_and_image(save=False)
+    image = convert2double(image)
     image = image.flatten() / 255
     predict_text = crack_captcha(image)
     print("期望: {}  预测: {}".format(text, predict_text))

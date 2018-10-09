@@ -1,8 +1,10 @@
 images/*
+font/*
 venv/*
 .idea/*
 *.log
 model/*
 __pycache__/*
 board/*
+nn_021/*
 */board/*
