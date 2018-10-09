@@ -23,21 +23,19 @@ def train_crack_captcha_cnn():
         sess.run(tf.global_variables_initializer())
         step = 0
         start = time.time()
+        paths = LOG_PATH.split('.')
+        log_path = '{}.{}.{}'.format('.'.join(paths[:-1]), str(int(start)), paths[-1])
         while True:
-            batch_x, batch_y = get_next_batch(64)
+            batch_x, batch_y = get_next_batch(BATCH_SIZE)
             _, loss_ = sess.run([optimizer, loss], feed_dict={X: batch_x, Y: batch_y, keep_prob: 0.75})
-            log('step:{} loss:{}'.format(step, loss_), start)
+            log('step:{} loss:{}'.format(step, loss_), log_path, start)
             if step % 100 == 0:
                 batch_x_test, batch_y_test = get_next_batch(100)
                 acc = sess.run(accuracy, feed_dict={X: batch_x_test, Y: batch_y_test, keep_prob: 1.})
-                log('step:{} ----accuracy:{}'.format(step, acc), start)
-                if acc > 0.95:
-                    saver.save(sess, './model/sina95/sina.capcha', global_step=step)
+                log('step:{} ----accuracy:{}'.format(step, acc), log_path, start)
+                if acc > STOP_ACC:
+                    saver.save(sess, CKPT_PATH, global_step=step)
                     break
-                if acc > 0.9:
-                    saver.save(sess, './model/sina90/sina.capcha', global_step=step)
-                elif acc > 0.8:
-                    saver.save(sess, './model/sina80/sina.capcha', global_step=step)
             step += 1
     tf.summary.FileWriter(BOARD_PATH, sess.graph)
 

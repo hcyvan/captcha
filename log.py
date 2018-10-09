@@ -1,11 +1,12 @@
 import sys
+import os
 import time
 import datetime
 from config import *
 import matplotlib.pyplot as plt
 
 
-def log(msg, start=None):
+def log(msg, log_path, start=None):
     def get_progress_time(s):
         h = s // 3600
         s = s % 3600
@@ -20,14 +21,20 @@ def log(msg, start=None):
         log_msg = '{} training:{} {}'.format(time_now, ts, msg)
     else:
         log_msg = '{} {}'.format(time_now, msg)
-    with open(LOG_PATH, 'a') as f:
+
+    with open(log_path, 'a') as f:
         f.write(log_msg + '\n')
     sys.stdout.write(log_msg + '\n')
 
 
 def draw_train_acc():
+    files = []
+    for f in os.listdir(os.path.dirname(LOG_PATH)):
+        if f != os.path.basename(LOG_PATH) and f.split('.')[0] == os.path.basename(LOG_PATH).split('.')[0]:
+            files.append(f)
+    files.sort()
     acc = []
-    with open(LOG_PATH) as f:
+    with open(os.path.join(os.path.dirname(LOG_PATH), files[-1])) as f:
         for line in f.readlines():
             data = line.split(' ')[4]
             if data.startswith('----accuracy'):
